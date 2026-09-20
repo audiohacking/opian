@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <functional>
+#include <initializer_list>
 #include <vector>
 
 inline void paintOpianPad (juce::Graphics& g, juce::Rectangle<float> cell,
@@ -27,12 +28,13 @@ struct PadItem
 class PadBank : public juce::Component
 {
 public:
-    PadBank (juce::String titleToUse, std::vector<juce::String> namesToUse, int columnsToUse)
+    PadBank (juce::String titleToUse, std::initializer_list<const char*> namesToUse, int columnsToUse)
         : title (std::move (titleToUse)), columns (std::max (1, columnsToUse))
     {
         items.reserve (namesToUse.size());
-        for (int i = 0; i < (int) namesToUse.size(); ++i)
-            items.push_back ({ namesToUse[(size_t) i], i });
+        int i = 0;
+        for (auto* name : namesToUse)
+            items.push_back ({ name, i++ });
         setInterceptsMouseClicks (true, false);
     }
 
