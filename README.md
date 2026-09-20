@@ -1,4 +1,4 @@
-# OPIAN
+# O'PIAN
 
 <img width="1082" height="708" alt="OPIAN chord builder" src="https://github.com/user-attachments/assets/78027ce8-4ba3-41d1-87a3-0aa57106cc06" />
 
