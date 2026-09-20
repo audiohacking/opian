@@ -2,11 +2,11 @@
 set -euo pipefail
 
 # Build a simple macOS .pkg that installs OPIAN AU + VST3 (+ Standalone.app).
-# Usage: ./scripts/build-installer-pkg.sh --version v0.2.1
+# Usage: ./scripts/build-installer-pkg.sh --version v0.2.2
 
-VERSION="${2:-0.2.1}"
+VERSION="${2:-0.2.2}"
 if [[ "${1:-}" == "--version" ]]; then
-  VERSION="${2:-0.2.1}"
+  VERSION="${2:-0.2.2}"
 fi
 VERSION="${VERSION#v}"
 

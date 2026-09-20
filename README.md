@@ -40,7 +40,7 @@ OPIAN emits MIDI on four channels from one resolve:
 
 **Live record (Reaper / Live / Bitwig):** put OPIAN on a MIDI/instrument track. Create four more MIDI tracks whose input is OPIAN, each filtered to channel 1–4, each with its own synth. Arm them and play. Parts stay in harmonic lock.
 
-**Standalone virtual cables:** set Output Mode to *Virtual cables* to create ports `OPIAN Keys/Bass/Arp/Pad` (macOS; Windows needs a loopback port).
+**Standalone virtual cables:** set Output Mode to *Virtual cables* to create ports `OPIAN Keys/Bass/Arp/Pad` (macOS and Linux). Windows has no virtual MIDI ports in JUCE — use channel 1–4, or a loopback driver.
 
 Logic’s plugin MIDI-out is awkward — use Standalone cables or IAC.
 

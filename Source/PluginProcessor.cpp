@@ -128,10 +128,12 @@ void OpianAudioProcessor::openVirtualCables()
     if (apvts.getRawParameterValue ("outputMode")->load() < 0.5f)
         return;
 
+   #if JUCE_MAC || JUCE_IOS || JUCE_LINUX || JUCE_BSD
     if (cableKeys == nullptr) cableKeys = juce::MidiOutput::createNewDevice ("OPIAN Keys");
     if (cableBass == nullptr) cableBass = juce::MidiOutput::createNewDevice ("OPIAN Bass");
     if (cableArp == nullptr)  cableArp  = juce::MidiOutput::createNewDevice ("OPIAN Arp");
     if (cablePad == nullptr)  cablePad  = juce::MidiOutput::createNewDevice ("OPIAN Pad");
+   #endif
 }
 
 void OpianAudioProcessor::sendToVirtualCables (const juce::MidiBuffer& buffer)
