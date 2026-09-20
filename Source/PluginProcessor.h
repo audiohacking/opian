@@ -15,11 +15,11 @@
 #include <array>
 #include <bitset>
 
-class AnopiAudioProcessor : public juce::AudioProcessor
+class OpianAudioProcessor : public juce::AudioProcessor
 {
 public:
-    AnopiAudioProcessor();
-    ~AnopiAudioProcessor() override;
+    OpianAudioProcessor();
+    ~OpianAudioProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -46,14 +46,14 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState apvts;
-    anopi::LiveEventFifo liveFifo;
-    anopi::ControlMap controlMap;
-    anopi::MidiCapture capture;
+    opian::LiveEventFifo liveFifo;
+    opian::ControlMap controlMap;
+    opian::MidiCapture capture;
 
-    anopi::ChordResult getMonitor() const;
+    opian::ChordResult getMonitor() const;
     std::bitset<13> getHeldDegrees() const { return heldDegrees; }
     int getTonalCenter() const;
-    bool pushLive (const anopi::LiveEvent& e) { return liveFifo.push (e); }
+    bool pushLive (const opian::LiveEvent& e) { return liveFifo.push (e); }
     void exportCaptureToFile (const juce::File& file);
     bool isStandaloneWrapper() const;
     bool startAudioCapture (const juce::File& file);
@@ -68,9 +68,9 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
-    anopi::ChordRequest makeRequest() const;
+    opian::ChordRequest makeRequest() const;
     void handleIncomingMidi (const juce::MidiMessage& msg, int sample, juce::MidiBuffer& out);
-    void handleLiveEvent (const anopi::LiveEvent& e, int sample, juce::MidiBuffer& out);
+    void handleLiveEvent (const opian::LiveEvent& e, int sample, juce::MidiBuffer& out);
     void triggerDegree (int degree, int velocity, int sample, juce::MidiBuffer& out);
     void releaseDegree (int degree, int sample, juce::MidiBuffer& out);
     void refreshLinkedParts (int sample, juce::MidiBuffer& out, bool padReplace);
@@ -80,10 +80,10 @@ private:
     void openVirtualCables();
     void sendToVirtualCables (const juce::MidiBuffer& buffer);
 
-    anopi::ChordEngine engine;
-    anopi::ModuleRouter router;
-    anopi::ArpClock arp;
-    anopi::PreviewSynth synth;
+    opian::ChordEngine engine;
+    opian::ModuleRouter router;
+    opian::ArpClock arp;
+    opian::PreviewSynth synth;
     AudioRecorder audioRecorder;
 
     std::array<std::vector<int>, 13> degreeNotes {};
@@ -93,12 +93,12 @@ private:
     int currentBass = -1;
     int currentAltBass = -1;
     int lastDegree = -1;
-    anopi::ChordResult lastChord;
+    opian::ChordResult lastChord;
     mutable juce::SpinLock monitorLock;
 
     std::unique_ptr<juce::MidiOutput> cableKeys, cableBass, cableArp, cablePad;
     double currentBpm = 120.0;
     double currentSampleRate = 44100.0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnopiAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OpianAudioProcessor)
 };

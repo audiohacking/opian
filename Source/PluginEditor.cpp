@@ -9,7 +9,7 @@ void styleToggle (juce::ToggleButton& b)
 }
 } // namespace
 
-AnopiAudioProcessorEditor::AnopiAudioProcessorEditor (AnopiAudioProcessor& p)
+OpianAudioProcessorEditor::OpianAudioProcessorEditor (OpianAudioProcessor& p)
     : juce::AudioProcessorEditor (p), proc (p)
 {
     setLookAndFeel (&look);
@@ -74,7 +74,7 @@ AnopiAudioProcessorEditor::AnopiAudioProcessorEditor (AnopiAudioProcessor& p)
     };
     strum.onStrum = [this] (int i, bool on)
     {
-        proc.pushLive ({ on ? anopi::LiveEvent::Type::StrumOn : anopi::LiveEvent::Type::StrumOff,
+        proc.pushLive ({ on ? opian::LiveEvent::Type::StrumOn : opian::LiveEvent::Type::StrumOff,
                          (uint8_t) i, (uint8_t) 100, 0 });
     };
 
@@ -84,7 +84,7 @@ AnopiAudioProcessorEditor::AnopiAudioProcessorEditor (AnopiAudioProcessor& p)
         if (v != lastBend)
         {
             lastBend = v;
-            proc.pushLive ({ anopi::LiveEvent::Type::PitchBend, 0, 0, v });
+            proc.pushLive ({ opian::LiveEvent::Type::PitchBend, 0, 0, v });
         }
     };
 
@@ -121,7 +121,7 @@ AnopiAudioProcessorEditor::AnopiAudioProcessorEditor (AnopiAudioProcessor& p)
 
     allOffBtn.onClick = [this]
     {
-        proc.pushLive ({ anopi::LiveEvent::Type::AllNotesOff, 0, 0, 0 });
+        proc.pushLive ({ opian::LiveEvent::Type::AllNotesOff, 0, 0, 0 });
     };
 
     learnBtn.onClick = [this]
@@ -178,7 +178,7 @@ AnopiAudioProcessorEditor::AnopiAudioProcessorEditor (AnopiAudioProcessor& p)
     juce::Timer::callAfterDelay (150, [this] { grabKeyboardFocus(); });
 }
 
-AnopiAudioProcessorEditor::~AnopiAudioProcessorEditor()
+OpianAudioProcessorEditor::~OpianAudioProcessorEditor()
 {
     auto dest = pendingMidiFile;
     setCaptureArmed (false);
@@ -188,7 +188,7 @@ AnopiAudioProcessorEditor::~AnopiAudioProcessorEditor()
     setLookAndFeel (nullptr);
 }
 
-void AnopiAudioProcessorEditor::paint (juce::Graphics& g)
+void OpianAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll (juce::Colour (0xffc5d4b8));
     g.setColour (juce::Colour (0xff2a3328).withAlpha (0.12f));
@@ -196,13 +196,13 @@ void AnopiAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colour (0xff2a3328));
     g.setFont (juce::FontOptions (18.0f).withStyle ("Bold"));
-    g.drawText ("ANOPI", 12, 8, 84, 22, juce::Justification::centredLeft);
+    g.drawText ("OPIAN", 12, 8, 84, 22, juce::Justification::centredLeft);
     g.setFont (juce::FontOptions (10.0f));
     g.setColour (juce::Colour (0xff5a6658));
     g.drawText ("chord builder", 96, 10, 100, 18, juce::Justification::centredLeft);
 }
 
-void AnopiAudioProcessorEditor::resized()
+void OpianAudioProcessorEditor::resized()
 {
     auto r = getLocalBounds().reduced (8);
     auto top = r.removeFromTop (22);
@@ -270,21 +270,21 @@ void AnopiAudioProcessorEditor::resized()
     octPads.setBounds (opts.reduced (0, 1));
 }
 
-void AnopiAudioProcessorEditor::timerCallback()
+void OpianAudioProcessorEditor::timerCallback()
 {
     const auto chord = proc.getMonitor();
     monitor.setChord (chord);
     keyboard.setHeld (proc.getHeldDegrees());
-    const auto scaleId = (anopi::ScaleId) juce::jlimit (0, (int) anopi::ScaleId::Count - 1,
+    const auto scaleId = (opian::ScaleId) juce::jlimit (0, (int) opian::ScaleId::Count - 1,
                                                        (int) proc.apvts.getRawParameterValue ("scale")->load());
-    keyboard.setLabels (anopi::degreeLabels (scaleId));
+    keyboard.setLabels (opian::degreeLabels (scaleId));
     scalePads.setSelected ((int) scaleId);
     colorPads.setSelected (juce::jlimit (0, 3, (int) proc.apvts.getRawParameterValue ("color")->load()));
     invPads.setSelected (juce::jlimit (0, 3, (int) proc.apvts.getRawParameterValue ("inversion")->load()));
     arpPads.setSelected (juce::jlimit (0, 3, (int) proc.apvts.getRawParameterValue ("arpDivision")->load()));
     outPads.setSelected (juce::jlimit (0, 1, (int) proc.apvts.getRawParameterValue ("outputMode")->load()));
     octPads.setSelected (juce::jlimit (0, 5, (int) proc.apvts.getRawParameterValue ("inputOctave")->load()));
-    extPads.setSelected ((int) anopi::stageFromExtensions (proc.apvts.getRawParameterValue ("extensions")->load()));
+    extPads.setSelected ((int) opian::stageFromExtensions (proc.apvts.getRawParameterValue ("extensions")->load()));
     tonal.setSelected (proc.getTonalCenter());
     strum.setTones (chord.midiNotes);
 
@@ -297,26 +297,26 @@ void AnopiAudioProcessorEditor::timerCallback()
         setRecButtonRecording (proc.isAudioCapturing());
 }
 
-void AnopiAudioProcessorEditor::mouseDown (const juce::MouseEvent& e)
+void OpianAudioProcessorEditor::mouseDown (const juce::MouseEvent& e)
 {
     juce::ignoreUnused (e);
     grabKeyboardFocus();
 }
 
-void AnopiAudioProcessorEditor::pushDegree (int degree, bool on)
+void OpianAudioProcessorEditor::pushDegree (int degree, bool on)
 {
-    proc.pushLive ({ on ? anopi::LiveEvent::Type::DegreeOn : anopi::LiveEvent::Type::DegreeOff,
+    proc.pushLive ({ on ? opian::LiveEvent::Type::DegreeOn : opian::LiveEvent::Type::DegreeOff,
                      (uint8_t) juce::jlimit (0, 12, degree), (uint8_t) 100, 0 });
 }
 
-void AnopiAudioProcessorEditor::setChoice (const char* paramId, int index)
+void OpianAudioProcessorEditor::setChoice (const char* paramId, int index)
 {
     if (auto* p = proc.apvts.getParameter (paramId))
         p->setValueNotifyingHost (p->convertTo0to1 ((float) index));
     grabKeyboardFocus();
 }
 
-void AnopiAudioProcessorEditor::setCaptureArmed (bool on)
+void OpianAudioProcessorEditor::setCaptureArmed (bool on)
 {
     if (auto* p = proc.apvts.getParameter ("capture"))
         p->setValueNotifyingHost (on ? 1.0f : 0.0f);
@@ -325,14 +325,14 @@ void AnopiAudioProcessorEditor::setCaptureArmed (bool on)
         pendingMidiFile = juce::File();
 }
 
-void AnopiAudioProcessorEditor::setRecButtonRecording (bool on)
+void OpianAudioProcessorEditor::setRecButtonRecording (bool on)
 {
     recBtn.setButtonText (on ? "STOP" : "REC");
 }
 
-void AnopiAudioProcessorEditor::chooseAndStartMidiCapture()
+void OpianAudioProcessorEditor::chooseAndStartMidiCapture()
 {
-    auto startAt = lastMidiFolder.getChildFile ("ANOPI.mid");
+    auto startAt = lastMidiFolder.getChildFile ("OPIAN.mid");
     auto chooser = std::make_shared<juce::FileChooser> ("Save MIDI capture", startAt, "*.mid");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
                               | juce::FileBrowserComponent::canSelectFiles
@@ -351,12 +351,12 @@ void AnopiAudioProcessorEditor::chooseAndStartMidiCapture()
                           });
 }
 
-void AnopiAudioProcessorEditor::chooseAndStartAudioCapture()
+void OpianAudioProcessorEditor::chooseAndStartAudioCapture()
 {
     if (! proc.isStandaloneWrapper())
         return;
 
-    auto startAt = lastWavFolder.getChildFile ("ANOPI.wav");
+    auto startAt = lastWavFolder.getChildFile ("OPIAN.wav");
     auto chooser = std::make_shared<juce::FileChooser> ("Record audio", startAt, "*.wav");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
                               | juce::FileBrowserComponent::canSelectFiles
@@ -375,10 +375,10 @@ void AnopiAudioProcessorEditor::chooseAndStartAudioCapture()
                           });
 }
 
-void AnopiAudioProcessorEditor::chooseAndSaveSettings()
+void OpianAudioProcessorEditor::chooseAndSaveSettings()
 {
-    auto startAt = lastSettingsFolder.getChildFile ("ANOPI.xml");
-    auto chooser = std::make_shared<juce::FileChooser> ("Save ANOPI settings", startAt, "*.xml");
+    auto startAt = lastSettingsFolder.getChildFile ("OPIAN.xml");
+    auto chooser = std::make_shared<juce::FileChooser> ("Save OPIAN settings", startAt, "*.xml");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
                               | juce::FileBrowserComponent::canSelectFiles
                               | juce::FileBrowserComponent::warnAboutOverwriting,
@@ -395,9 +395,9 @@ void AnopiAudioProcessorEditor::chooseAndSaveSettings()
                           });
 }
 
-void AnopiAudioProcessorEditor::chooseAndLoadSettings()
+void OpianAudioProcessorEditor::chooseAndLoadSettings()
 {
-    auto chooser = std::make_shared<juce::FileChooser> ("Load ANOPI settings", lastSettingsFolder, "*.xml");
+    auto chooser = std::make_shared<juce::FileChooser> ("Load OPIAN settings", lastSettingsFolder, "*.xml");
     chooser->launchAsync (juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
                           [this, chooser] (const juce::FileChooser& fc)
                           {
@@ -410,11 +410,11 @@ void AnopiAudioProcessorEditor::chooseAndLoadSettings()
                           });
 }
 
-void AnopiAudioProcessorEditor::syncQwertyDegrees()
+void OpianAudioProcessorEditor::syncQwertyDegrees()
 {
     for (int i = 0; i < 13; ++i)
     {
-        const bool down = juce::KeyPress::isKeyCurrentlyDown (anopi::ControlMap::kDegreeKeyCodes[(size_t) i]);
+        const bool down = juce::KeyPress::isKeyCurrentlyDown (opian::ControlMap::kDegreeKeyCodes[(size_t) i]);
         if (down != qwertyHeld.test ((size_t) i))
         {
             qwertyHeld.set ((size_t) i, down);
@@ -424,11 +424,11 @@ void AnopiAudioProcessorEditor::syncQwertyDegrees()
 
     for (int i = 0; i < 4; ++i)
     {
-        const bool down = juce::KeyPress::isKeyCurrentlyDown (anopi::ControlMap::kStrumKeyCodes[(size_t) i]);
+        const bool down = juce::KeyPress::isKeyCurrentlyDown (opian::ControlMap::kStrumKeyCodes[(size_t) i]);
         if (down != qwertyStrum.test ((size_t) i))
         {
             qwertyStrum.set ((size_t) i, down);
-            proc.pushLive ({ down ? anopi::LiveEvent::Type::StrumOn : anopi::LiveEvent::Type::StrumOff,
+            proc.pushLive ({ down ? opian::LiveEvent::Type::StrumOn : opian::LiveEvent::Type::StrumOff,
                              (uint8_t) i, (uint8_t) 100, 0 });
         }
     }
@@ -437,32 +437,32 @@ void AnopiAudioProcessorEditor::syncQwertyDegrees()
     if (root != qwertyBassRoot)
     {
         qwertyBassRoot = root;
-        proc.pushLive ({ root ? anopi::LiveEvent::Type::BassRootOn : anopi::LiveEvent::Type::BassRootOff, 0, 100, 0 });
+        proc.pushLive ({ root ? opian::LiveEvent::Type::BassRootOn : opian::LiveEvent::Type::BassRootOff, 0, 100, 0 });
     }
     const bool alt = juce::KeyPress::isKeyCurrentlyDown ('N');
     if (alt != qwertyBassAlt)
     {
         qwertyBassAlt = alt;
-        proc.pushLive ({ alt ? anopi::LiveEvent::Type::BassAltOn : anopi::LiveEvent::Type::BassAltOff, 0, 100, 0 });
+        proc.pushLive ({ alt ? opian::LiveEvent::Type::BassAltOn : opian::LiveEvent::Type::BassAltOff, 0, 100, 0 });
     }
 
     proc.shiftHeld.store (juce::ModifierKeys::getCurrentModifiers().isShiftDown());
 }
 
-bool AnopiAudioProcessorEditor::keyStateChanged (bool)
+bool OpianAudioProcessorEditor::keyStateChanged (bool)
 {
     syncQwertyDegrees();
     return false;
 }
 
-bool AnopiAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
+bool OpianAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
 {
     if (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown())
         return false;
 
     const int code = key.getKeyCode();
 
-    if (auto pc = anopi::ControlMap::qwertyTonal (code))
+    if (auto pc = opian::ControlMap::qwertyTonal (code))
     {
         if (auto* param = proc.apvts.getParameter ("tonalCenter"))
             param->setValueNotifyingHost (param->convertTo0to1 ((float) *pc));
@@ -506,7 +506,7 @@ bool AnopiAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
     if (code == juce::KeyPress::spaceKey) { toggle ("sustain"); return true; }
     if (code == '[' || code == ']')
     {
-        const int cur = (int) anopi::stageFromExtensions (proc.apvts.getRawParameterValue ("extensions")->load());
+        const int cur = (int) opian::stageFromExtensions (proc.apvts.getRawParameterValue ("extensions")->load());
         const int next = (cur + (code == ']' ? 1 : -1) + 6) % 6;
         static constexpr float kStageValue[] = { 0.09f, 0.30f, 0.50f, 0.65f, 0.79f, 0.93f };
         if (auto* p = proc.apvts.getParameter ("extensions"))
@@ -523,12 +523,12 @@ bool AnopiAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
     if (code == '.') { bend.setValue (juce::jlimit (0.0, 1.0, bend.getValue() + 0.05)); return true; }
 
     syncQwertyDegrees();
-    return anopi::ControlMap::qwertyDegree (code).has_value()
-        || anopi::ControlMap::qwertyStrum (code).has_value()
+    return opian::ControlMap::qwertyDegree (code).has_value()
+        || opian::ControlMap::qwertyStrum (code).has_value()
         || code == 'B' || code == 'N';
 }
 
-juce::AudioProcessorEditor* AnopiAudioProcessor::createEditor()
+juce::AudioProcessorEditor* OpianAudioProcessor::createEditor()
 {
-    return new AnopiAudioProcessorEditor (*this);
+    return new OpianAudioProcessorEditor (*this);
 }

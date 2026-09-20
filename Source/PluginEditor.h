@@ -10,10 +10,10 @@
 
 #include <bitset>
 
-class AnopiLookAndFeel : public juce::LookAndFeel_V4
+class OpianLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
-    AnopiLookAndFeel()
+    OpianLookAndFeel()
     {
         setColour (juce::Slider::thumbColourId, juce::Colour (0xff2a3328));
         setColour (juce::Slider::trackColourId, juce::Colour (0xff8aa060));
@@ -32,7 +32,7 @@ public:
         juce::ignoreUnused (highlighted);
         const float font = button.getHeight() <= 26 ? 9.5f
                                                     : juce::jlimit (9.0f, 12.0f, (float) button.getHeight() * 0.40f);
-        paintAnopiPad (g, button.getLocalBounds().toFloat().reduced (0.5f),
+        paintOpianPad (g, button.getLocalBounds().toFloat().reduced (0.5f),
                        button.getToggleState() || down,
                        button.getButtonText(),
                        font);
@@ -91,12 +91,12 @@ public:
     }
 };
 
-class AnopiAudioProcessorEditor : public juce::AudioProcessorEditor,
+class OpianAudioProcessorEditor : public juce::AudioProcessorEditor,
                                   private juce::Timer
 {
 public:
-    explicit AnopiAudioProcessorEditor (AnopiAudioProcessor&);
-    ~AnopiAudioProcessorEditor() override;
+    explicit OpianAudioProcessorEditor (OpianAudioProcessor&);
+    ~OpianAudioProcessorEditor() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -116,8 +116,8 @@ private:
     void chooseAndSaveSettings();
     void chooseAndLoadSettings();
 
-    AnopiAudioProcessor& proc;
-    AnopiLookAndFeel look;
+    OpianAudioProcessor& proc;
+    OpianLookAndFeel look;
 
     ChordMonitor monitor;
     ChordBuilderKeyboard keyboard;
@@ -172,5 +172,5 @@ private:
     juce::File pendingMidiFile;
     juce::File lastMidiFolder, lastWavFolder, lastSettingsFolder;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnopiAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OpianAudioProcessorEditor)
 };

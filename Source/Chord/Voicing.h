@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace anopi
+namespace opian
 {
 
 /** Fold pitch-classes into a compact register around a voicing slider (0–1). */
@@ -16,4 +16,4 @@ int bassRegisterNote (int rootPc, float voicing) noexcept;
 int altBassRegisterNote (int rootPc, int fifthOrThirdInterval, float voicing) noexcept;
 std::vector<int> applyInversion (std::vector<int> notes, int inversion);
 
-} // namespace anopi
+} // namespace opian

@@ -42,7 +42,7 @@ public:
             auto cell = juce::Rectangle<float> (r.getX() + gap + (w + gap) * (float) col,
                                                 r.getY() + gap + (h + gap) * (float) row,
                                                 w, h);
-            paintAnopiPad (g, cell, i == selected, names[i], font);
+            paintOpianPad (g, cell, i == selected, names[i], font);
         }
     }
 

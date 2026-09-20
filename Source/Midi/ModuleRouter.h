@@ -3,7 +3,7 @@
 #include <array>
 #include <juce_audio_basics/juce_audio_basics.h>
 
-namespace anopi
+namespace opian
 {
 
 enum class Module : int
@@ -42,4 +42,4 @@ private:
     bool sustain = false;
 };
 
-} // namespace anopi
+} // namespace opian

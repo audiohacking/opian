@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-namespace anopi
+namespace opian
 {
 
 inline constexpr std::array<int, 7> kMajorScale = { 0, 2, 4, 5, 7, 9, 11 };
@@ -133,4 +133,4 @@ inline const char* pcName (int pc, bool preferFlats) noexcept
                        : kPcSharpNames[static_cast<size_t> (pc)];
 }
 
-} // namespace anopi
+} // namespace opian

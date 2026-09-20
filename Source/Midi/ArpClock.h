@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace anopi
+namespace opian
 {
 
 class ArpClock
@@ -76,4 +76,4 @@ private:
     int lastNote = -1;
 };
 
-} // namespace anopi
+} // namespace opian

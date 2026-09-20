@@ -4,7 +4,7 @@
 #include <functional>
 #include <vector>
 
-inline void paintAnopiPad (juce::Graphics& g, juce::Rectangle<float> cell,
+inline void paintOpianPad (juce::Graphics& g, juce::Rectangle<float> cell,
                            bool on, const juce::String& text, float fontSize)
 {
     auto r = cell.reduced (1.0f);
@@ -96,7 +96,7 @@ public:
         for (int i = 0; i < n; ++i)
         {
             const bool on = items[(size_t) i].value == selectedValue;
-            paintAnopiPad (g, cellAt (r, i, w, h, gap), on, items[(size_t) i].name, font);
+            paintOpianPad (g, cellAt (r, i, w, h, gap), on, items[(size_t) i].name, font);
         }
     }
 

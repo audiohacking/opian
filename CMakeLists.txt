@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(ANOPI VERSION 0.1.0 LANGUAGES C CXX)
+project(OPIAN VERSION 0.2.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-option(ANOPI_BUILD_TESTS "Build ANOPI unit tests" ON)
-option(ANOPI_COPY_PLUGIN_AFTER_BUILD "Copy AU/VST3 into the system plugin folders after build" ON)
+option(OPIAN_BUILD_TESTS "Build OPIAN unit tests" ON)
+option(OPIAN_COPY_PLUGIN_AFTER_BUILD "Copy AU/VST3 into the system plugin folders after build" ON)
 if(DEFINED ENV{GITHUB_ACTIONS})
-    set(ANOPI_COPY_PLUGIN_AFTER_BUILD OFF)
+    set(OPIAN_COPY_PLUGIN_AFTER_BUILD OFF)
 endif()
 
 include(FetchContent)
@@ -23,31 +23,31 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(juce)
 
 if(APPLE)
-    set(ANOPI_FORMATS AU VST3 Standalone)
+    set(OPIAN_FORMATS AU VST3 Standalone)
 else()
-    set(ANOPI_FORMATS VST3 Standalone)
+    set(OPIAN_FORMATS VST3 Standalone)
 endif()
 
-juce_add_plugin(ANOPI
-    COMPANY_NAME "ANOPI"
-    BUNDLE_ID com.anopi.chordbuilder
-    PLUGIN_MANUFACTURER_CODE Anpi
-    PLUGIN_CODE Chb1
-    FORMATS ${ANOPI_FORMATS}
-    PRODUCT_NAME "ANOPI"
-    PLUGIN_NAME "ANOPI"
+juce_add_plugin(OPIAN
+    COMPANY_NAME "OPIAN"
+    BUNDLE_ID com.opian.chordbuilder
+    PLUGIN_MANUFACTURER_CODE Opia
+    PLUGIN_CODE Opi1
+    FORMATS ${OPIAN_FORMATS}
+    PRODUCT_NAME "OPIAN"
+    PLUGIN_NAME "OPIAN"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT TRUE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
-    COPY_PLUGIN_AFTER_BUILD ${ANOPI_COPY_PLUGIN_AFTER_BUILD}
+    COPY_PLUGIN_AFTER_BUILD ${OPIAN_COPY_PLUGIN_AFTER_BUILD}
     VST3_CATEGORIES Instrument
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     MICROPHONE_PERMISSION_ENABLED FALSE
 )
 
-target_sources(ANOPI
+target_sources(OPIAN
     PRIVATE
         Source/Audio/PreviewSynth.cpp
         Source/Chord/ChordEngine.cpp
@@ -58,12 +58,12 @@ target_sources(ANOPI
         Source/PluginProcessor.cpp
 )
 
-target_include_directories(ANOPI
+target_include_directories(OPIAN
     PRIVATE
         Source
 )
 
-target_compile_definitions(ANOPI
+target_compile_definitions(OPIAN
     PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
@@ -72,7 +72,7 @@ target_compile_definitions(ANOPI
         JUCE_REPORT_APP_USAGE=0
 )
 
-target_link_libraries(ANOPI
+target_link_libraries(OPIAN
     PRIVATE
         juce::juce_audio_utils
         juce::juce_audio_formats
@@ -82,14 +82,14 @@ target_link_libraries(ANOPI
         juce::juce_recommended_config_flags
 )
 
-if(ANOPI_BUILD_TESTS)
+if(OPIAN_BUILD_TESTS)
     include(CTest)
     enable_testing()
-    add_executable(anopi_tests
+    add_executable(opian_tests
         Tests/ChordEngineTests.cpp
         Source/Chord/ChordEngine.cpp
         Source/Chord/Voicing.cpp
     )
-    target_include_directories(anopi_tests PRIVATE Source)
-    add_test(NAME ChordEngine COMMAND anopi_tests)
+    target_include_directories(opian_tests PRIVATE Source)
+    add_test(NAME ChordEngine COMMAND opian_tests)
 endif()

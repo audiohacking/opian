@@ -1,7 +1,7 @@
 #include "Voicing.h"
 #include "ChordTypes.h"
 
-namespace anopi
+namespace opian
 {
 
 int bassRegisterNote (int rootPc, float voicing) noexcept
@@ -73,4 +73,4 @@ std::vector<int> applyInversion (std::vector<int> notes, int inversion)
     return notes;
 }
 
-} // namespace anopi
+} // namespace opian

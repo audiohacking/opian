@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace anopi
+namespace opian
 {
 
 enum class Tonality : uint8_t
@@ -142,4 +142,4 @@ inline ExtensionStage stageFromExtensions (float extensions) noexcept
     return ExtensionStage::Thirteenth;
 }
 
-} // namespace anopi
+} // namespace opian

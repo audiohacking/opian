@@ -5,7 +5,7 @@ namespace
 juce::StringArray keyNames() { return { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }; }
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout AnopiAudioProcessor::createLayout()
+juce::AudioProcessorValueTreeState::ParameterLayout OpianAudioProcessor::createLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> p;
     p.push_back (std::make_unique<juce::AudioParameterChoice> ("tonalCenter", "Tonal Center", keyNames(), 0));
@@ -45,57 +45,57 @@ juce::AudioProcessorValueTreeState::ParameterLayout AnopiAudioProcessor::createL
     return { p.begin(), p.end() };
 }
 
-AnopiAudioProcessor::AnopiAudioProcessor()
+OpianAudioProcessor::OpianAudioProcessor()
     : juce::AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-      apvts (*this, nullptr, "ANOPI", createLayout())
+      apvts (*this, nullptr, "OPIAN", createLayout())
 {
 }
 
-AnopiAudioProcessor::~AnopiAudioProcessor()
+OpianAudioProcessor::~OpianAudioProcessor()
 {
     audioRecorder.stop();
 }
 
-bool AnopiAudioProcessor::isStandaloneWrapper() const
+bool OpianAudioProcessor::isStandaloneWrapper() const
 {
     return wrapperType == wrapperType_Standalone
         || juce::PluginHostType::getPluginLoadedAs() == wrapperType_Standalone
         || juce::JUCEApplicationBase::isStandaloneApp();
 }
 
-int AnopiAudioProcessor::getTonalCenter() const
+int OpianAudioProcessor::getTonalCenter() const
 {
     return (int) apvts.getRawParameterValue ("tonalCenter")->load();
 }
 
-anopi::ChordResult AnopiAudioProcessor::getMonitor() const
+opian::ChordResult OpianAudioProcessor::getMonitor() const
 {
     const juce::SpinLock::ScopedLockType lock (monitorLock);
     return lastChord;
 }
 
-anopi::ChordRequest AnopiAudioProcessor::makeRequest() const
+opian::ChordRequest OpianAudioProcessor::makeRequest() const
 {
-    anopi::ChordRequest r;
+    opian::ChordRequest r;
     r.tonalCenter = (int) apvts.getRawParameterValue ("tonalCenter")->load();
-    r.scale = (anopi::ScaleId) juce::jlimit (0, (int) anopi::ScaleId::Count - 1,
+    r.scale = (opian::ScaleId) juce::jlimit (0, (int) opian::ScaleId::Count - 1,
                                             (int) apvts.getRawParameterValue ("scale")->load());
-    r.tonality = (r.scale == anopi::ScaleId::NaturalMinor || r.scale == anopi::ScaleId::HarmonicMinor
-                  || r.scale == anopi::ScaleId::MelodicMinor)
-                     ? anopi::Tonality::Minor
-                     : anopi::Tonality::Major;
-    r.color = (anopi::ColorMode) juce::jlimit (0, (int) anopi::ColorMode::Count - 1,
+    r.tonality = (r.scale == opian::ScaleId::NaturalMinor || r.scale == opian::ScaleId::HarmonicMinor
+                  || r.scale == opian::ScaleId::MelodicMinor)
+                     ? opian::Tonality::Minor
+                     : opian::Tonality::Major;
+    r.color = (opian::ColorMode) juce::jlimit (0, (int) opian::ColorMode::Count - 1,
                                               (int) apvts.getRawParameterValue ("color")->load());
     r.inversion = juce::jlimit (0, 3, (int) apvts.getRawParameterValue ("inversion")->load());
-    r.layout = apvts.getRawParameterValue ("layout")->load() > 0.5f ? anopi::LayoutMode::RealScale
-                                                                    : anopi::LayoutMode::Static;
+    r.layout = apvts.getRawParameterValue ("layout")->load() > 0.5f ? opian::LayoutMode::RealScale
+                                                                    : opian::LayoutMode::Static;
     r.shift = apvts.getRawParameterValue ("shift")->load() > 0.5f || shiftHeld.load();
     r.extensions = apvts.getRawParameterValue ("extensions")->load();
     r.voicing = apvts.getRawParameterValue ("voicing")->load();
     return r;
 }
 
-void AnopiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void OpianAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     currentSampleRate = sampleRate;
     router.prepare();
@@ -105,7 +105,7 @@ void AnopiAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     openVirtualCables();
 }
 
-void AnopiAudioProcessor::releaseResources()
+void OpianAudioProcessor::releaseResources()
 {
     audioRecorder.stop();
     cableKeys.reset();
@@ -115,33 +115,33 @@ void AnopiAudioProcessor::releaseResources()
     synth.reset();
 }
 
-bool AnopiAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool OpianAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     const auto& main = layouts.getMainOutputChannelSet();
     return main == juce::AudioChannelSet::mono() || main == juce::AudioChannelSet::stereo();
 }
 
-void AnopiAudioProcessor::openVirtualCables()
+void OpianAudioProcessor::openVirtualCables()
 {
     if (! isStandaloneWrapper())
         return;
     if (apvts.getRawParameterValue ("outputMode")->load() < 0.5f)
         return;
 
-    if (cableKeys == nullptr) cableKeys = juce::MidiOutput::createNewDevice ("ANOPI Keys");
-    if (cableBass == nullptr) cableBass = juce::MidiOutput::createNewDevice ("ANOPI Bass");
-    if (cableArp == nullptr)  cableArp  = juce::MidiOutput::createNewDevice ("ANOPI Arp");
-    if (cablePad == nullptr)  cablePad  = juce::MidiOutput::createNewDevice ("ANOPI Pad");
+    if (cableKeys == nullptr) cableKeys = juce::MidiOutput::createNewDevice ("OPIAN Keys");
+    if (cableBass == nullptr) cableBass = juce::MidiOutput::createNewDevice ("OPIAN Bass");
+    if (cableArp == nullptr)  cableArp  = juce::MidiOutput::createNewDevice ("OPIAN Arp");
+    if (cablePad == nullptr)  cablePad  = juce::MidiOutput::createNewDevice ("OPIAN Pad");
 }
 
-void AnopiAudioProcessor::sendToVirtualCables (const juce::MidiBuffer& buffer)
+void OpianAudioProcessor::sendToVirtualCables (const juce::MidiBuffer& buffer)
 {
     if (cableKeys == nullptr && cableBass == nullptr && cableArp == nullptr && cablePad == nullptr)
         return;
 
     juce::MidiBuffer b0, b1, b2, b3;
-    const int ch[4] = { router.getChannel (anopi::Module::Keys), router.getChannel (anopi::Module::Bass),
-                        router.getChannel (anopi::Module::Arp), router.getChannel (anopi::Module::Pad) };
+    const int ch[4] = { router.getChannel (opian::Module::Keys), router.getChannel (opian::Module::Bass),
+                        router.getChannel (opian::Module::Arp), router.getChannel (opian::Module::Pad) };
     juce::MidiBuffer* outs[4] = { &b0, &b1, &b2, &b3 };
     juce::MidiOutput* cables[4] = { cableKeys.get(), cableBass.get(), cableArp.get(), cablePad.get() };
 
@@ -158,7 +158,7 @@ void AnopiAudioProcessor::sendToVirtualCables (const juce::MidiBuffer& buffer)
             cables[i]->sendBlockOfMessagesNow (*outs[i]);
 }
 
-void AnopiAudioProcessor::triggerDegree (int degree, int velocity, int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::triggerDegree (int degree, int velocity, int sample, juce::MidiBuffer& out)
 {
     degree = juce::jlimit (0, 12, degree);
     auto req = makeRequest();
@@ -176,17 +176,17 @@ void AnopiAudioProcessor::triggerDegree (int degree, int velocity, int sample, j
     degreeNotes[(size_t) degree] = chord.midiNotes;
 
     for (int n : chord.midiNotes)
-        router.noteOn (anopi::Module::Keys, n, velocity, sample, out);
+        router.noteOn (opian::Module::Keys, n, velocity, sample, out);
 
     refreshLinkedParts (sample, out, true);
     arp.setChord (chord.midiNotes);
 }
 
-void AnopiAudioProcessor::releaseDegree (int degree, int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::releaseDegree (int degree, int sample, juce::MidiBuffer& out)
 {
     degree = juce::jlimit (0, 12, degree);
     for (int n : degreeNotes[(size_t) degree])
-        router.noteOff (anopi::Module::Keys, n, sample, out);
+        router.noteOff (opian::Module::Keys, n, sample, out);
     degreeNotes[(size_t) degree].clear();
     heldDegrees.reset ((size_t) degree);
 
@@ -199,7 +199,7 @@ void AnopiAudioProcessor::releaseDegree (int degree, int sample, juce::MidiBuffe
         releaseBass (sample, out);
 }
 
-void AnopiAudioProcessor::refreshLinkedParts (int sample, juce::MidiBuffer& out, bool padReplace)
+void OpianAudioProcessor::refreshLinkedParts (int sample, juce::MidiBuffer& out, bool padReplace)
 {
     const bool bassLink = apvts.getRawParameterValue ("bassLink")->load() > 0.5f;
     if (bassLink && lastChord.bassNote >= 0)
@@ -208,7 +208,7 @@ void AnopiAudioProcessor::refreshLinkedParts (int sample, juce::MidiBuffer& out,
         {
             releaseBass (sample, out);
             currentBass = lastChord.bassNote;
-            router.noteOn (anopi::Module::Bass, currentBass, 100, sample, out);
+            router.noteOn (opian::Module::Bass, currentBass, 100, sample, out);
         }
     }
 
@@ -217,34 +217,34 @@ void AnopiAudioProcessor::refreshLinkedParts (int sample, juce::MidiBuffer& out,
         releasePad (sample, out);
         padNotes = lastChord.midiNotes;
         for (int n : padNotes)
-            router.noteOn (anopi::Module::Pad, n, 82, sample, out);
+            router.noteOn (opian::Module::Pad, n, 82, sample, out);
     }
 }
 
-void AnopiAudioProcessor::releasePad (int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::releasePad (int sample, juce::MidiBuffer& out)
 {
     for (int n : padNotes)
-        router.noteOff (anopi::Module::Pad, n, sample, out);
+        router.noteOff (opian::Module::Pad, n, sample, out);
     padNotes.clear();
 }
 
-void AnopiAudioProcessor::releaseBass (int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::releaseBass (int sample, juce::MidiBuffer& out)
 {
     if (currentBass >= 0)
-        router.noteOff (anopi::Module::Bass, currentBass, sample, out);
+        router.noteOff (opian::Module::Bass, currentBass, sample, out);
     if (currentAltBass >= 0)
-        router.noteOff (anopi::Module::Bass, currentAltBass, sample, out);
+        router.noteOff (opian::Module::Bass, currentAltBass, sample, out);
     currentBass = -1;
     currentAltBass = -1;
 }
 
-void AnopiAudioProcessor::strumTone (int index, bool on, int velocity, int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::strumTone (int index, bool on, int velocity, int sample, juce::MidiBuffer& out)
 {
     index = juce::jlimit (0, 3, index);
     if (! on)
     {
         if (strumNotes[(size_t) index] >= 0)
-            router.noteOff (anopi::Module::Keys, strumNotes[(size_t) index], sample, out);
+            router.noteOff (opian::Module::Keys, strumNotes[(size_t) index], sample, out);
         strumNotes[(size_t) index] = -1;
         return;
     }
@@ -254,14 +254,14 @@ void AnopiAudioProcessor::strumTone (int index, bool on, int velocity, int sampl
 
     const int note = lastChord.midiNotes[(size_t) juce::jmin (index, (int) lastChord.midiNotes.size() - 1)];
     if (strumNotes[(size_t) index] >= 0)
-        router.noteOff (anopi::Module::Keys, strumNotes[(size_t) index], sample, out);
+        router.noteOff (opian::Module::Keys, strumNotes[(size_t) index], sample, out);
     strumNotes[(size_t) index] = note;
-    router.noteOn (anopi::Module::Keys, note, velocity, sample, out);
+    router.noteOn (opian::Module::Keys, note, velocity, sample, out);
 }
 
-void AnopiAudioProcessor::handleLiveEvent (const anopi::LiveEvent& e, int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::handleLiveEvent (const opian::LiveEvent& e, int sample, juce::MidiBuffer& out)
 {
-    using T = anopi::LiveEvent::Type;
+    using T = opian::LiveEvent::Type;
     switch (e.type)
     {
         case T::DegreeOn:  triggerDegree ((int) e.a, (int) e.b, sample, out); break;
@@ -272,28 +272,28 @@ void AnopiAudioProcessor::handleLiveEvent (const anopi::LiveEvent& e, int sample
             if (lastChord.bassNote >= 0)
             {
                 if (currentBass >= 0)
-                    router.noteOff (anopi::Module::Bass, currentBass, sample, out);
+                    router.noteOff (opian::Module::Bass, currentBass, sample, out);
                 currentBass = lastChord.bassNote;
-                router.noteOn (anopi::Module::Bass, currentBass, (int) e.b, sample, out);
+                router.noteOn (opian::Module::Bass, currentBass, (int) e.b, sample, out);
             }
             break;
         case T::BassRootOff:
             if (currentBass >= 0)
-                router.noteOff (anopi::Module::Bass, currentBass, sample, out);
+                router.noteOff (opian::Module::Bass, currentBass, sample, out);
             currentBass = -1;
             break;
         case T::BassAltOn:
             if (lastChord.altBassNote >= 0)
             {
                 if (currentAltBass >= 0)
-                    router.noteOff (anopi::Module::Bass, currentAltBass, sample, out);
+                    router.noteOff (opian::Module::Bass, currentAltBass, sample, out);
                 currentAltBass = lastChord.altBassNote;
-                router.noteOn (anopi::Module::Bass, currentAltBass, (int) e.b, sample, out);
+                router.noteOn (opian::Module::Bass, currentAltBass, (int) e.b, sample, out);
             }
             break;
         case T::BassAltOff:
             if (currentAltBass >= 0)
-                router.noteOff (anopi::Module::Bass, currentAltBass, sample, out);
+                router.noteOff (opian::Module::Bass, currentAltBass, sample, out);
             currentAltBass = -1;
             break;
         case T::PitchBend:
@@ -311,7 +311,7 @@ void AnopiAudioProcessor::handleLiveEvent (const anopi::LiveEvent& e, int sample
     }
 }
 
-void AnopiAudioProcessor::handleIncomingMidi (const juce::MidiMessage& msg, int sample, juce::MidiBuffer& out)
+void OpianAudioProcessor::handleIncomingMidi (const juce::MidiMessage& msg, int sample, juce::MidiBuffer& out)
 {
     const int playOct = (int) apvts.getRawParameterValue ("inputOctave")->load() + 1;
     const int tonalOct = (int) apvts.getRawParameterValue ("tonalOctave")->load() + 2;
@@ -402,7 +402,7 @@ void AnopiAudioProcessor::handleIncomingMidi (const juce::MidiMessage& msg, int 
     }
 }
 
-void AnopiAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi)
+void OpianAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -419,10 +419,10 @@ void AnopiAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::M
     const bool bassOn = apvts.getRawParameterValue ("bassOn")->load() > 0.5f;
     const bool arpOn = apvts.getRawParameterValue ("arpOn")->load() > 0.5f;
     const bool padOn = apvts.getRawParameterValue ("padOn")->load() > 0.5f;
-    router.setEnabled (anopi::Module::Keys, keysOn, midi, 0);
-    router.setEnabled (anopi::Module::Bass, bassOn, midi, 0);
-    router.setEnabled (anopi::Module::Arp, arpOn, midi, 0);
-    router.setEnabled (anopi::Module::Pad, padOn, midi, 0);
+    router.setEnabled (opian::Module::Keys, keysOn, midi, 0);
+    router.setEnabled (opian::Module::Bass, bassOn, midi, 0);
+    router.setEnabled (opian::Module::Arp, arpOn, midi, 0);
+    router.setEnabled (opian::Module::Pad, padOn, midi, 0);
     router.setSustain (apvts.getRawParameterValue ("sustain")->load() > 0.5f, 0, midi);
 
     capture.setRecording (apvts.getRawParameterValue ("capture")->load() > 0.5f);
@@ -433,19 +433,19 @@ void AnopiAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::M
     for (const auto meta : incoming)
         handleIncomingMidi (meta.getMessage(), meta.samplePosition, midi);
 
-    anopi::LiveEvent live;
+    opian::LiveEvent live;
     while (liveFifo.pop (live))
         handleLiveEvent (live, 0, midi);
 
     const int divChoice = (int) apvts.getRawParameterValue ("arpDivision")->load();
     const int division = 4 << juce::jlimit (0, 3, divChoice); // 4,8,16,32
     arp.process ((int) audio.getNumSamples(), currentBpm, division, arpOn,
-                 [&] (int note, int sample) { router.noteOn (anopi::Module::Arp, note, 96, sample, midi); },
-                 [&] (int note, int sample) { router.noteOff (anopi::Module::Arp, note, sample, midi); });
+                 [&] (int note, int sample) { router.noteOn (opian::Module::Arp, note, 96, sample, midi); },
+                 [&] (int note, int sample) { router.noteOff (opian::Module::Arp, note, sample, midi); });
 
     const std::array<int, 4> chans {
-        router.getChannel (anopi::Module::Keys), router.getChannel (anopi::Module::Bass),
-        router.getChannel (anopi::Module::Arp), router.getChannel (anopi::Module::Pad)
+        router.getChannel (opian::Module::Keys), router.getChannel (opian::Module::Bass),
+        router.getChannel (opian::Module::Arp), router.getChannel (opian::Module::Pad)
     };
     capture.tap (midi, audio.getNumSamples(), chans);
     sendToVirtualCables (midi);
@@ -465,7 +465,7 @@ void AnopiAudioProcessor::processBlock (juce::AudioBuffer<float>& audio, juce::M
     audioRecorder.tap (audio);
 }
 
-void AnopiAudioProcessor::exportCaptureToFile (const juce::File& file)
+void OpianAudioProcessor::exportCaptureToFile (const juce::File& file)
 {
     auto midiFile = capture.toMidiFile (currentBpm);
     auto dest = file;
@@ -479,7 +479,7 @@ void AnopiAudioProcessor::exportCaptureToFile (const juce::File& file)
         midiFile.writeTo (stream);
 }
 
-bool AnopiAudioProcessor::startAudioCapture (const juce::File& file)
+bool OpianAudioProcessor::startAudioCapture (const juce::File& file)
 {
     if (! isStandaloneWrapper())
         return false;
@@ -487,19 +487,19 @@ bool AnopiAudioProcessor::startAudioCapture (const juce::File& file)
     return audioRecorder.start (file, currentSampleRate > 0.0 ? currentSampleRate : 44100.0, chans);
 }
 
-void AnopiAudioProcessor::stopAudioCapture()
+void OpianAudioProcessor::stopAudioCapture()
 {
     audioRecorder.stop();
 }
 
-juce::File AnopiAudioProcessor::getSettingsFolder() const
+juce::File OpianAudioProcessor::getSettingsFolder() const
 {
-    auto dir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("ANOPI");
+    auto dir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("OPIAN");
     dir.createDirectory();
     return dir;
 }
 
-void AnopiAudioProcessor::saveSettingsToFile (const juce::File& file)
+void OpianAudioProcessor::saveSettingsToFile (const juce::File& file)
 {
     auto dest = file;
     if (dest.getFileExtension().isEmpty())
@@ -509,7 +509,7 @@ void AnopiAudioProcessor::saveSettingsToFile (const juce::File& file)
         xml->writeTo (dest);
 }
 
-bool AnopiAudioProcessor::loadSettingsFromFile (const juce::File& file)
+bool OpianAudioProcessor::loadSettingsFromFile (const juce::File& file)
 {
     if (! file.existsAsFile())
         return false;
@@ -521,13 +521,13 @@ bool AnopiAudioProcessor::loadSettingsFromFile (const juce::File& file)
     return false;
 }
 
-void AnopiAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void OpianAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     if (auto xml = apvts.copyState().createXml())
         copyXmlToBinary (*xml, destData);
 }
 
-void AnopiAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void OpianAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         apvts.replaceState (juce::ValueTree::fromXml (*xml));
@@ -535,5 +535,5 @@ void AnopiAudioProcessor::setStateInformation (const void* data, int sizeInBytes
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new AnopiAudioProcessor();
+    return new OpianAudioProcessor();
 }

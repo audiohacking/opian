@@ -5,7 +5,7 @@
 #include <atomic>
 #include <cstdint>
 
-namespace anopi
+namespace opian
 {
 
 class MidiCapture
@@ -64,7 +64,7 @@ public:
         file.setTicksPerQuarterNote (480);
         const double ticksPerSample = (bpm > 0.0 ? bpm : 120.0) / 60.0 * 480.0 / sampleRate;
 
-        const char* names[] = { "ANOPI Keys", "ANOPI Bass", "ANOPI Arp", "ANOPI Pad" };
+        const char* names[] = { "OPIAN Keys", "OPIAN Bass", "OPIAN Arp", "OPIAN Pad" };
 
         for (int i = 0; i < 4; ++i)
         {
@@ -103,4 +103,4 @@ private:
     std::array<juce::MidiMessageSequence, 4> tracks;
 };
 
-} // namespace anopi
+} // namespace opian

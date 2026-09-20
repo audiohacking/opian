@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace anopi
+namespace opian
 {
 
 ControlMap::ControlMap() = default;
@@ -74,4 +74,4 @@ bool ControlMap::consumeLearnCC (int cc, int /*channel*/) noexcept
     return true;
 }
 
-} // namespace anopi
+} // namespace opian

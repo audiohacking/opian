@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace anopi
+namespace opian
 {
 
 void ModuleRouter::prepare()
@@ -111,4 +111,4 @@ void ModuleRouter::setSustain (bool on, int sample, juce::MidiBuffer& out)
     }
 }
 
-} // namespace anopi
+} // namespace opian

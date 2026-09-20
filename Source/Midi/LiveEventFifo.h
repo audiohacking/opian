@@ -4,7 +4,7 @@
 #include <atomic>
 #include <cstdint>
 
-namespace anopi
+namespace opian
 {
 
 struct LiveEvent
@@ -61,4 +61,4 @@ private:
     std::atomic<int> read { 0 };
 };
 
-} // namespace anopi
+} // namespace opian

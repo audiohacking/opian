@@ -4,7 +4,7 @@
 #include <array>
 #include <cmath>
 
-namespace anopi
+namespace opian
 {
 
 class PreviewSynth
@@ -213,4 +213,4 @@ private:
     }
 };
 
-} // namespace anopi
+} // namespace opian

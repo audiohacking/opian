@@ -6,7 +6,7 @@
 class ChordMonitor : public juce::Component
 {
 public:
-    void setChord (const anopi::ChordResult& c)
+    void setChord (const opian::ChordResult& c)
     {
         symbol = c.symbol;
         roman = c.roman;

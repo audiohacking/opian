@@ -39,7 +39,7 @@ public:
             juce::String lab = fallback[i];
             if ((size_t) i < tones.size())
                 lab = juce::MidiMessage::getMidiNoteName (tones[(size_t) i], true, true, 3);
-            paintAnopiPad (g, cell, i == pressed, lab, juce::jlimit (10.0f, 13.0f, h * 0.42f));
+            paintOpianPad (g, cell, i == pressed, lab, juce::jlimit (10.0f, 13.0f, h * 0.42f));
         }
     }
 

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <sstream>
 
-namespace anopi
+namespace opian
 {
 namespace
 {
@@ -307,4 +307,4 @@ ChordResult ChordEngine::resolve (const ChordRequest& request) const
     return result;
 }
 
-} // namespace anopi
+} // namespace opian

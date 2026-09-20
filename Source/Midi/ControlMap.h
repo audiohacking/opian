@@ -6,7 +6,7 @@
 #include <optional>
 #include <string>
 
-namespace anopi
+namespace opian
 {
 
 enum class ControlAction : uint8_t
@@ -83,4 +83,4 @@ public:
     bool consumeLearnCC (int cc, int channel) noexcept;
 };
 
-} // namespace anopi
+} // namespace opian

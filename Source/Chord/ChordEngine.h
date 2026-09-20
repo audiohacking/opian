@@ -2,7 +2,7 @@
 
 #include "ChordTypes.h"
 
-namespace anopi
+namespace opian
 {
 
 class ChordEngine
@@ -13,4 +13,4 @@ public:
     static int layoutDegreePc (const ChordRequest& request) noexcept;
 };
 
-} // namespace anopi
+} // namespace opian

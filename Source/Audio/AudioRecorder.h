@@ -66,7 +66,7 @@ public:
     }
 
 private:
-    juce::TimeSliceThread thread { "ANOPI Audio Rec" };
+    juce::TimeSliceThread thread { "OPIAN Audio Rec" };
     juce::CriticalSection writerLock;
     std::unique_ptr<juce::AudioFormatWriter::ThreadedWriter> threadedWriter;
     std::atomic<bool> recording { false };
